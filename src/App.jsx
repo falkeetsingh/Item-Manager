@@ -1,7 +1,7 @@
 import React from 'react';
 import {BrowserRouter as Router, Routes, Route, Link} from 'react-router-dom';
-import AddItem from './pages/AddItem/AddItem';
-import ViewItem from './pages/ViewItem/ViewItem';
+import AddItem from './Pages/AddItem/AddItem';
+import ViewItem from './Pages/ViewItem/ViewItem';
 
 const App = () => {
   return (
