@@ -14,33 +14,35 @@ const upload = multer({ storage });
 
 router.post(
     '/',
-    upload.fields([
-        {name:'coverImage',maxCount:1},
-        {name:'additionalImages',maxCount:10},
-    ]),
-    async(req,res)=>{
-        try{
-            const {name,type,description} = req.body;
-            if(!req.files || !req.files.coverImage){
-                return res.status(400).json({error:'cover image is required.'});
+    [ // We are wrapping the middleware and the handler in an array.
+        upload.fields([
+            { name: 'coverImage', maxCount: 1 },
+            { name: 'additionalImages', maxCount: 10 },
+        ]),
+        async (req, res) => {
+            try {
+                const { name, type, description } = req.body;
+                if (!req.files || !req.files.coverImage) {
+                    return res.status(400).json({ error: 'cover image is required.' });
+                }
+                const coverImage = req.files.coverImage[0].path;
+                const additionalImages = req.files.additionalImages?.map(f => f.path) || [];
+
+                const item = new Item({
+                    name,
+                    type,
+                    description,
+                    coverImage,
+                    additionalImages
+                });
+                await item.save();
+
+                res.status(201).json({ message: 'Item added', item });
+            } catch (err) {
+                res.status(500).json({ error: err.message });
             }
-            const coverImage = req.files.coverImage[0].path;
-            const additionalImages = req.files.additionalImages?.map(f=>f.path)||[];
-
-            const item = new Item({
-                name,
-                type,
-                description,
-                coverImage,
-                additionalImages
-            });
-            await item.save();
-
-            res.status(201).json({ message: 'Item added', item });
-        }catch(err){
-            res.status(500).json({ error: err.message });
         }
-    }
+    ]
 );
 
 router.get('/', async(req,res)=>{
